@@ -1,12 +1,11 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
 public class RandomSentence {
     private static final RandomGenerator RANDOM = RandomGenerator.getDefault();
-
-    public static String DialogueGenerator(String noun, String adjective) {
-        return format(noun, adjective);
-    }
 
     public static String DialogueGenerator(List<String> nouns, List<String> adjectives) {
         return format(select(nouns), select(adjectives));

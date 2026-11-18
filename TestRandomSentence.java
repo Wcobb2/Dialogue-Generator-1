@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -5,6 +6,8 @@ import java.util.List;
 public class TestRandomSentence {
     public static void main(String[] args) throws Exception {
         testWordListsContain200ValuesEach();
+        testReadsCsvFiles();
+        testPropagatesIoErrors();
         testFormatsSingleValues();
         testSelectsValuesFromLists();
         testAcceptsMixedValuesAndLists();
@@ -17,10 +20,46 @@ public class TestRandomSentence {
         }
     }
 
+    private static void testReadsCsvFiles() throws Exception {
+        Path nouns = Files.createTempFile("nouns", ".csv");
+        Path adjectives = Files.createTempFile("adjectives", ".csv");
+        try {
+            Files.write(nouns, List.of("otter", "fox"));
+            Files.write(adjectives, List.of("curious", "clever"));
+
+            String sentence = RandomSentence.DialogueGenerator(
+                    nouns.toString(), adjectives.toString());
+            check(List.of("What a curious otter!", "What a curious fox!",
+                            "What a clever otter!", "What a clever fox!")
+                            .contains(sentence),
+                    "CSV values should be used to form the sentence");
+        } finally {
+            Files.deleteIfExists(nouns);
+            Files.deleteIfExists(adjectives);
+        }
+    }
+
+    private static void testPropagatesIoErrors() throws Exception {
+        Path adjectives = Files.createTempFile("adjectives", ".csv");
+        try {
+            Files.write(adjectives, List.of("curious"));
+            try {
+                RandomSentence.DialogueGenerator(
+                        adjectives.resolveSibling("missing-nouns.csv").toString(),
+                        adjectives.toString());
+                throw new AssertionError("a missing CSV file should cause an IOException");
+            } catch (IOException expected) {
+                // The file-reading error should be visible to the caller.
+            }
+        } finally {
+            Files.deleteIfExists(adjectives);
+        }
+    }
+
     private static void testFormatsSingleValues() {
-        check(RandomSentence.DialogueGenerator("otter", "curious")
+        check(RandomSentence.DialogueGenerator(List.of("otter"), List.of("curious"))
                         .equals("What a curious otter!"),
-                "single values should be formatted");
+                "single values in lists should be formatted");
     }
 
     private static void testSelectsValuesFromLists() {
