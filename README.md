@@ -1,29 +1,48 @@
 # Dialogue-Generator-1
 
-`nouns.csv` and `adjectives.csv` each contain 200 words. The Java
-`RandomSentence.DialogueGenerator` accepts paths to the noun and adjective CSV files
-and returns a sentence. It also accepts lists of choices for either:
+## Playful competition phrases
+
+`DialogueGenerator` produces one playful, competition-focused phrase at a
+time:
 
 ```java
+DialogueGenerator generator = new DialogueGenerator(42, DialogueGenerator.Style.CONFIDENT);
+System.out.println(generator.nextPhrase());
+```
+
+Styles are `CONFIDENT`, `SILLY`, and `DRAMATIC`. The seed makes the sequence
+repeatable; use `new DialogueGenerator(DialogueGenerator.Style.CONFIDENT)` for
+an unseeded sequence. A generator avoids repeating the previous phrase.
+
+The phrase lists are in `DialogueGenerator.java`; add phrases to the
+appropriate style to expand the selection.
+To run the example, use `javac DialogueGenerator.java Test2.java` followed by
+`java Test2`.
+
+## Simple sentences
+
+The existing `RandomSentence.DialogueGenerator` methods remain available for
+the original "What a [adjective] [noun]!" format. They accept lists for both
+words, or a fixed value for either word:
+
+```java
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-String sentence = RandomSentence.DialogueGenerator("nouns.csv", "adjectives.csv");
-
-String fromChoices = RandomSentence.DialogueGenerator(
-    List.of("otter", "fox"), List.of("curious", "clever"));
+List<String> nouns = Files.readAllLines(Path.of("nouns.csv"));
+List<String> adjectives = Files.readAllLines(Path.of("adjectives.csv"));
+String sentence = RandomSentence.DialogueGenerator(nouns, adjectives);
+String fixedNoun = RandomSentence.DialogueGenerator("otter", adjectives);
 ```
 
-The file-based overload throws `IOException` if either CSV file cannot be read.
+The CSV files contain one word per line. `Files.readAllLines` throws
+`IOException` if a file cannot be read.
 
-```java
-import java.io.IOException;
+Compile and run the standalone tests:
 
-try {
-    String sentence = RandomSentence.DialogueGenerator("nouns.csv", "adjectives.csv");
-} catch (IOException e) {
-    // Handle a CSV file read failure.
-}
+```sh
+javac RandomSentence.java DialogueGenerator.java TestRandomSentence.java TestDialogueGenerator.java
+java TestRandomSentence
+java TestDialogueGenerator
 ```
-
-Compile and run the standalone tests with `javac RandomSentence.java TestRandomSentence.java`
-and `java TestRandomSentence`.
