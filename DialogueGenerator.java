@@ -5,78 +5,67 @@ import java.util.random.RandomGenerator;
 
 /** Generates playful, competition-focused phrases in a chosen style. */
 public class DialogueGenerator {
-    public enum Style {
+
+    private static enum Style {
         CONFIDENT, SILLY, DRAMATIC
     }
 
     private static final List<String> CONFIDENT_PHRASES = List.of(
-            "I'm going to win this round!",
-            "You have no chance!",
-            "Victory is within my reach!",
-            "I've got this game in the bag!",
-            "I'm ready to claim the win!",
-            "You can't keep up with me!",
-            "This round is mine!",
-            "I'm bringing my best game!",
-            "Watch me take the lead!",
-            "I'm here to win!");
+            "No <adjective> <noun> can stop me from winning!",
+            "My <adjective> <noun> is ready to claim victory!",
+            "Watch this <adjective> <noun> take the lead!",
+            "I'm bringing my <adjective> <noun> to the competition!",
+            "This <adjective> <noun> is taking home the win!",
+            "You can't outplay my <adjective> <noun>!",
+            "A <adjective> <noun> like mine guarantees victory!",
+            "My <adjective> <noun> has this round in the bag!",
+            "The <adjective> <noun> is all I need to win!",
+            "I'm here to prove this <adjective> <noun> is unbeatable!");
 
     private static final List<String> SILLY_PHRASES = List.of(
-            "Prepare to be defeated by my lucky socks!",
-            "My victory dance is already warming up!",
-            "You can't outrun my imaginary rocket shoes!",
-            "I'm powered by snacks and the desire to win!",
-            "Behold my highly questionable winning strategy!",
-            "My secret weapon is an extra helping of enthusiasm!",
-            "I'm coming for the crown, and maybe a cookie!",
-            "Even my imaginary mascot believes in me!",
-            "My game plan is chaos with a side of victory!",
-            "You haven't seen my final form: extra confident!");
+            "Prepare to be defeated by my <adjective> <noun>!",
+            "My <adjective> <noun> is already warming up its victory dance!",
+            "You can't outrun this <adjective> <noun>!",
+            "I'm powered by my <adjective> <noun> and a snack!",
+            "Behold my <adjective> <noun>—the plan is questionable!",
+            "My secret weapon is a <adjective> <noun>!",
+            "I'm coming for the crown with my <adjective> <noun>!",
+            "Even my <adjective> <noun> believes in me!",
+            "My game plan is a <adjective> <noun> with a side of chaos!",
+            "You haven't seen my final form: a <adjective> <noun>!");
 
     private static final List<String> DRAMATIC_PHRASES = List.of(
-            "The stage is set, and victory awaits me!",
-            "This is the moment my legend begins!",
-            "Today, the scoreboard shall know my name!",
-            "The final round belongs to me!",
-            "Witness the dawn of my triumph!",
-            "The contest ends with my glorious victory!",
-            "I shall rise to the challenge and prevail!",
-            "Let the games begin, and let my victory be remembered!",
-            "The crown awaits its rightful champion!",
-            "My path to victory cannot be stopped!");
+            "The <adjective> <noun> is the stage upon which my victory awaits!",
+            "This <adjective> <noun> marks the moment my legend begins!",
+            "Today, the scoreboard shall remember my <adjective> <noun>!",
+            "The final round belongs to my <adjective> <noun>!",
+            "Witness the dawn of my <adjective> <noun>!",
+            "The contest ends with my <adjective> <noun> triumphant!",
+            "I shall rise with my <adjective> <noun> and prevail!",
+            "Let the games begin, and let my <adjective> <noun> be remembered!",
+            "The crown awaits the <adjective> <noun> that claims it!",
+            "No force can stop my <adjective> <noun> on the path to victory!");
 
     private final RandomGenerator random;
     private final List<String> phrases;
     private int previousIndex = -1;
 
-    public DialogueGenerator(Style style) {
-        this(new Random(), style);
+    public DialogueGenerator() {
+        this(new Random(), Random.nextInt() % 3 == 0 ? Style.CONFIDENT : Random.nextInt() % 3 == 1 ? Style.SILLY : Style.DRAMATIC);
     }
 
-    public DialogueGenerator(long seed, Style style) {
-        this(new Random(seed), style);
+    public static DialogueGenerator getRandomPhrase() {
+        Style style = Random.nextInt() % 3 == 0 ? Style.CONFIDENT : Random.nextInt() % 3 == 1 ? Style.SILLY : Style.DRAMATIC;
+        return getRandomPhrase(style); 
     }
 
-    private DialogueGenerator(RandomGenerator random, Style style) {
-        this.random = random;
-        this.phrases = switch (Objects.requireNonNull(style, "style")) {
-            case CONFIDENT -> CONFIDENT_PHRASES;
-            case SILLY -> SILLY_PHRASES;
-            case DRAMATIC -> DRAMATIC_PHRASES;
-        };
-    }
-
-    public String nextPhrase() {
-        int index;
-        if (previousIndex < 0) {
-            index = random.nextInt(phrases.size());
+    public static String getRandomPhrase(Style style) {
+        if(style == Style.CONFIDENT) {
+            return CONFIDENT_PHRASES.get(random.nextInt(CONFIDENT_PHRASES.size()));
+        } else if(style == Style.SILLY) {
+            return SILLY_PHRASES.get(random.nextInt(SILLY_PHRASES.size()));
         } else {
-            index = random.nextInt(phrases.size() - 1);
-            if (index >= previousIndex) {
-                index++;
-            }
+            return DRAMATIC_PHRASES.get(random.nextInt(DRAMATIC_PHRASES.size()));
         }
-        previousIndex = index;
-        return phrases.get(index);
     }
 }
